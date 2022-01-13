@@ -1,19 +1,52 @@
 import csv, os
 
-#1. Open the Data File
+
+#variable for load file path
 file_to_load = os.path.join("resources","election_results.csv")
+
+#Variable for save file path
+file_to_save = os.path.join("analysis","election_analysis.txt")
+
+total_votes = 0
+candidate_options = []
+candidate_votes = {}
+
+winning_candidate = ""
+winning_count = 0
+winning_percentage = 0
 
 with open(file_to_load) as election_data:
     file_reader = csv.reader(election_data)
     headers = next(file_reader)
+    for row in file_reader:
+        #count total votes
+        total_votes += 1
+        #get candidate vote
+        name = row[2]
 
-#2. Write down the names of all the candidates
-file_to_save = os.path.join("analysis","election_analysis.txt")
-with open(file_to_save, "w") as txt_file:
-    txt_file.write("Counties in the Election\n________________________\n")
-    txt_file.write("Arapahoe\nDenver\nJefferson\n")
+        if name not in candidate_options:
+            #add candidate to list if not in it
+            candidate_options.append(name)
+            #create candidate's vote count
+            candidate_votes[name] = 0
 
-#3. Add a vote count for each candidate
+        #count candidate's vote
+        candidate_votes[name] +=1
 
-#4. Get the total votes for each candidate
-#5. Get the total votes cast for the election
+for candidate_name in  candidate_options:
+    votes = candidate_votes[candidate_name]
+    vote_percentage = float(votes/total_votes)*100
+    print(f"{candidate_name}: {vote_percentage: .1f}% ({votes:,})")
+    if (votes>winning_count) and (vote_percentage>winning_percentage):
+        winning_count = votes
+        winning_percentage = vote_percentage
+        winning_candidate = candidate_name
+
+winning_candidate_summary = (
+    f"-------------------------\n"
+    f"Winner: {winning_candidate}\n"
+    f"Winning Vote Count: {winning_count:,}\n"
+    f"Winning Percentage: {winning_percentage: .1f}%\n"
+    f"-------------------------\n"
+)
+print(winning_candidate_summary)
